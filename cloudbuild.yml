@@ -1,0 +1,5 @@
+ steps:
+  - name: "print Hello World!"
+    args: ["echo", "Hello, World!"]
+  - name: "print date"
+    args: ["date"]
