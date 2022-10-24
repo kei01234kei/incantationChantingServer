@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
-      - name: run lint
+      - name: Run lint
         uses: dominikh/staticcheck-action@v1.2.0
         with:
           version: "2022.1.1"
