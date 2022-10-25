@@ -35,7 +35,7 @@ curl http://localhost:8000/test
 
 ```bash
 # このコマンドでは /usr/local 配下のtestファイルをサーバにアップロードしています。
-curl -X POST http://localhost:8000/test-upload-file \
+curl -X POST http://localhost:8000/test-upload-file/test \
 -F "file=@/usr/local/test" \
 -H "Content-Type: multipart/form-data"
 ```
