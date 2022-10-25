@@ -11,6 +11,7 @@
 ### ローカルで開発環境を整備
 
 ```bash
+mkdir tmp
 go mod tidy
 go run src/main.go
 ```
