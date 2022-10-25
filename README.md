@@ -15,16 +15,18 @@ go mod tidy
 go run src/main.go
 ```
 
-```bash
-# このコマンドを実行すると{"message":"Hello World"}という値が帰ってきます。
-curl http://localhost:8000/test
-```
-
 ### Dockerで開発環境を整備
 
 ```bash
 docker build -t incantatio-chanting-server .
 docker run -itd -p 8000:8000 incantatio-chanting-server
+```
+
+## サーバの使用方法
+
+### テストコードの実行
+```bash
+# このコマンドを実行すると{"message":"Hello World"}という値が帰ってきます。
 curl http://localhost:8000/test
 ```
 
