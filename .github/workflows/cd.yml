@@ -5,6 +5,11 @@ on:
     branches:
       - main
 
+env:
+  GCP_PROJECT_ID: incantation-chanting-server
+  GCP_REGISTRY_NAME: incantation-chanting-server
+  GCP_CONTAINER_NAME: incantation-chanting-server
+
 jobs:
   build-and-push:
     name: Build and push docker image
@@ -16,12 +21,12 @@ jobs:
         uses: google-github-actions/setup-gcloud@main
         with:
           service_account_key: ${{ secrets.GIT_HUB_ACTIONS }}
-          project_id: incantation-chanting-server
+          project_id: ${{ env.GCP_PROJECT_ID }}
       - name: Configure docker for artifact registry
         run: |
           gcloud auth configure-docker asia-northeast1-docker.pkg.dev
-          docker build -t asia-northeast1-docker.pkg.dev/incantation-chanting-server/incantation-chanting-server/incantatio-chanting-server:${{ github.ref_name }} .
-          docker push asia-northeast1-docker.pkg.dev/incantation-chanting-server/incantation-chanting-server/incantatio-chanting-server:${{ github.ref_name }}
+          docker build -t asia-northeast1-docker.pkg.dev/${{ env.GCP_REGISTRY_NAME }}/${{ env.GCP_CONTAINER_NAME }}/incantatio-chanting-server:${{ github.ref_name }} .
+          docker push asia-northeast1-docker.pkg.dev/${{ env.GCP_REGISTRY_NAME }}/${{ env.GCP_CONTAINER_NAME }}/incantatio-chanting-server:${{ github.ref_name }}
 
   deploy:
     name: Deploy to cloud run
@@ -34,13 +39,13 @@ jobs:
         uses: google-github-actions/setup-gcloud@main
         with:
           service_account_key: ${{ secrets.GIT_HUB_ACTIONS }}
-          project_id: incantation-chanting-server
+          project_id: ${{ env.GCP_PROJECT_ID }}
       - name: Deploy to Cloud Run
         run: >
           gcloud run deploy
           ${{ github.event.repository.name }}
-          --project incantation-chanting-server
-          --image asia-northeast1-docker.pkg.dev/incantation-chanting-server/incantation-chanting-server/incantatio-chanting-server:${{ github.ref_name }} 
+          --project ${{ env.GCP_PROJECT_ID }}
+          --image asia-northeast1-docker.pkg.dev/${{ env.GCP_REGISTRY_NAME }}/${{ env.GCP_CONTAINER_NAME }}/incantatio-chanting-server:${{ github.ref_name }} 
           --region asia-northeast1
           --port 8000
           --max-instances 4
