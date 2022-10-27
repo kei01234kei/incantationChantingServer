@@ -40,14 +40,6 @@ jobs:
         with:
           service_account_key: ${{ secrets.GIT_HUB_ACTIONS }}
           project_id: ${{ env.GCP_PROJECT_ID }}
-      - name: Set IAM Policy
-        run: >
-          gcloud beta run services add-iam-policy-binding
-          --region=asia-northeast1
-          --member=allUsers
-          --role=roles/run.invoker
-          --quiet
-          ${{ env.GCP_PROJECT_ID }}
       - name: Deploy to Cloud Run
         run: >
           gcloud run deploy
