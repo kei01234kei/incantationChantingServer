@@ -46,6 +46,7 @@ jobs:
           --region=asia-northeast1
           --member=allUsers
           --role=roles/run.invoker
+          --quiet
           ${{ env.GCP_PROJECT_ID }}
       - name: Deploy to Cloud Run
         run: >
