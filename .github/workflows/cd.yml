@@ -38,9 +38,9 @@ jobs:
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy \
-            ${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/} \
+            ${{ github.event.repository.name }} \
             --project incantation-chanting-server \
-            --image asia-northeast1-docker.pkg.dev/incantation-chanting-server/incantation-chanting-server/incantatio-chanting-server:main \ 
+            --image asia-northeast1-docker.pkg.dev/incantation-chanting-server/incantation-chanting-server/incantatio-chanting-server:${{ github.ref_name }} \ 
             --region asia-northeast1 \
             --port 8000 \ 
             --max-instances 4 \
