@@ -40,10 +40,16 @@ jobs:
         with:
           service_account_key: ${{ secrets.GIT_HUB_ACTIONS }}
           project_id: ${{ env.GCP_PROJECT_ID }}
+      - name: Set IAM Policy
+        run: >
+          gcloud beta run services add-iam-policy-binding
+          --region=asia-northeast1
+          --member=allUsers
+          --role=roles/run.invoker
+          ${{ env.GCP_PROJECT_ID }}
       - name: Deploy to Cloud Run
         run: >
           gcloud run deploy
-          ${{ env.GCP_PROJECT_ID }}
           --project ${{ env.GCP_PROJECT_ID }}
           --image asia-northeast1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_REGISTRY_NAME }}/${{ env.GCP_CONTAINER_NAME }}:${{ github.ref_name }} 
           --region asia-northeast1
@@ -51,3 +57,4 @@ jobs:
           --max-instances 4
           --allow-unauthenticated
           --quiet
+          ${{ env.GCP_PROJECT_ID }}
