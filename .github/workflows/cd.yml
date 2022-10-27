@@ -45,4 +45,4 @@ jobs:
             --port 8000 \ 
             --max-instances 4 \
             --allow-unauthenticated \
-            --quiet \
+            --quiet
