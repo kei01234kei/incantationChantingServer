@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-push:
-    name: Build and Push docker image
+    name: Build and push docker image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -15,10 +15,34 @@ jobs:
       - name: Setup Google Cloud
         uses: google-github-actions/setup-gcloud@main
         with:
-          service_account_key: ${{ secrets.ARTIFACT_REGISTRY }}
+          service_account_key: ${{ secrets.GIT_HUB_ACTIONS }}
           project_id: incantation-chanting-server
       - name: Configure docker for artifact registry
         run: |
           gcloud auth configure-docker asia-northeast1-docker.pkg.dev
           docker build -t asia-northeast1-docker.pkg.dev/incantation-chanting-server/incantation-chanting-server/incantatio-chanting-server:${{ github.ref_name }} .
           docker push asia-northeast1-docker.pkg.dev/incantation-chanting-server/incantation-chanting-server/incantatio-chanting-server:${{ github.ref_name }}
+
+  deploy:
+    name: Deploy to cloud run
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Google Cloud
+        uses: google-github-actions/setup-gcloud@main
+        with:
+          service_account_key: ${{ secrets.GIT_HUB_ACTIONS }}
+          project_id: incantation-chanting-server
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy \
+            --project incantation-chanting-server \
+            --image asia-northeast1-docker.pkg.dev/incantation-chanting-server/incantation-chanting-server/incantatio-chanting-server:main \ 
+            --region asia-northeast1 \
+            --port 8000 \ 
+            --max-instances 4 \
+            --allow-unauthenticated \
+            --quiet \
+            incantation-chanting-server
