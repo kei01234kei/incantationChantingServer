@@ -10,7 +10,7 @@ jobs:
     name: staticcheck
     runs-on: ubuntu-latest
     steps:
-      - name: Check out Git repository
+      - name: Checkout
         uses: actions/checkout@v3
       - name: Run lint
         uses: dominikh/staticcheck-action@v1.2.0
