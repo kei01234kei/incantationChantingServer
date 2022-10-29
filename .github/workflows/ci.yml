@@ -75,4 +75,3 @@ jobs:
           echo '</a>' >> output.html
       - name: Notify application url
         run: gh pr comment ${{ github.event.pull_request.number }} --body-file ./output.html
-
