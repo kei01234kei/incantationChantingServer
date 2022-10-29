@@ -27,6 +27,7 @@ jobs:
 
   build-and-push:
     name: Build and push docker image
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -65,7 +66,7 @@ jobs:
           --allow-unauthenticated
           --format="json"
           --quiet
-          ${{ env.GCP_PROJECT_ID }}_stg > gcloud_deploy_output.json
+          ${{ env.GCP_PROJECT_ID }}-${{ env.DEPLOY_ENVIRONMENT }} > gcloud_deploy_output.json
       - name: Make comment file
         run: |
           echo '<h2>stg環境へのデプロイが完了しました。</h2><p>以下のURLからテストを行ってください。</p><a href="' > output.html
