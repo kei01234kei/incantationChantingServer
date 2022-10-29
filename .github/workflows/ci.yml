@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GIT_HUB_ACTIONS }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GCP_PROJECT_ID: incantation-chanting-server
   GCP_REPOSITORY_NAME: incantation-chanting-server
   GCP_IMAGE_NAME: incantation-chanting-server
@@ -69,10 +69,10 @@ jobs:
           ${{ env.GCP_PROJECT_ID }}-${{ env.DEPLOY_ENVIRONMENT }} > gcloud_deploy_output.json
       - name: Make comment file
         run: |
-          echo '<h2>stg環境へのデプロイが完了しました。</h2><p>以下のURLからテストを行ってください。</p><a href="' > output.html
+          echo -n '<h3>stg環境へのデプロイが完了しました。</h3><p>下のURLからテストを行ってください。</p><a href=' > output.html
           cat gcloud_deploy_output.json | jq ".status.url" >> output.html
-          echo '">' >> output.html
-          cat gcloud_deploy_output.json | jq ".status.url" >> output.html
-          echo '</a>' >> output.html
+          echo -n '>' >> output.html
+          cat gcloud_deploy_output.json | jq -r ".status.url" >> output.html
+          echo -n '</a>' >> output.html
       - name: Notify application url
         run: gh pr comment ${{ github.event.pull_request.number }} --body-file ./output.html
