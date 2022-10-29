@@ -21,9 +21,9 @@ jobs:
       - name: Setup Google Cloud
         uses: google-github-actions/setup-gcloud@main
         with:
-          service_account_key: ${{ secrets.GIT_HUB_ACTIONS }}
+          service_account_key: ${{ secrets.GCP_GIT_HUB_ACTIONS }}
           project_id: ${{ env.GCP_PROJECT_ID }}
-      - name: Configure docker for artifact registry
+      - name: Push docker container to artifact registry
         run: |
           gcloud auth configure-docker asia-northeast1-docker.pkg.dev
           docker build -t asia-northeast1-docker.pkg.dev/${{ env.GCP_REPOSITORY_NAME }}/${{ env.GCP_IMAGE_NAME }}/${{ env.GCP_CONTAINER_NAME }}:${{ github.ref_name }} .
@@ -39,7 +39,7 @@ jobs:
       - name: Setup Google Cloud
         uses: google-github-actions/setup-gcloud@main
         with:
-          service_account_key: ${{ secrets.GIT_HUB_ACTIONS }}
+          service_account_key: ${{ secrets.GCP_GIT_HUB_ACTIONS }}
           project_id: ${{ env.GCP_PROJECT_ID }}
       - name: Deploy to Cloud Run
         run: >
