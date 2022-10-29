@@ -69,7 +69,7 @@ jobs:
           ${{ env.GCP_PROJECT_ID }}-${{ env.DEPLOY_ENVIRONMENT }} > gcloud_deploy_output.json
       - name: Make comment file
         run: |
-          echo -n '<h3>stg環境へのデプロイが完了しました。</h3><p>下のURLからテストを行ってください。</p><a href=' > output.html
+          echo -n '<h2>stg環境へのデプロイが完了しました。</h2><p>下のURLからテストを行ってください。</p><a href=' > output.html
           cat gcloud_deploy_output.json | jq ".status.url" >> output.html
           echo -n '>' >> output.html
           cat gcloud_deploy_output.json | jq -r ".status.url" >> output.html
