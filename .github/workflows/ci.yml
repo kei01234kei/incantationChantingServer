@@ -5,9 +5,17 @@ on:
     branches:
       - main
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GIT_HUB_ACTIONS }}
+  GCP_PROJECT_ID: incantation-chanting-server
+  GCP_REPOSITORY_NAME: incantation-chanting-server
+  GCP_IMAGE_NAME: incantation-chanting-server
+  GCP_CONTAINER_NAME: incantation-chanting-server
+  DEPLOY_ENVIRONMENT: stg
+
 jobs:
   lint:
-    name: staticcheck
+    name: Staticcheck
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,3 +24,55 @@ jobs:
         uses: dominikh/staticcheck-action@v1.2.0
         with:
           version: "2022.1.1"
+
+  build-and-push:
+    name: Build and push docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Google Cloud
+        uses: google-github-actions/setup-gcloud@main
+        with:
+          service_account_key: ${{ secrets.GCP_GIT_HUB_ACTIONS }}
+          project_id: ${{ env.GCP_PROJECT_ID }}
+      - name: Push docker container to artifact registry
+        run: |
+          gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+          docker build -t asia-northeast1-docker.pkg.dev/${{ env.GCP_REPOSITORY_NAME }}/${{ env.GCP_IMAGE_NAME }}/${{ env.GCP_CONTAINER_NAME }}:${{ env.DEPLOY_ENVIRONMENT }} .
+          docker push asia-northeast1-docker.pkg.dev/${{ env.GCP_REPOSITORY_NAME }}/${{ env.GCP_IMAGE_NAME }}/${{ env.GCP_CONTAINER_NAME }}:${{ env.DEPLOY_ENVIRONMENT }}
+
+  deploy:
+    name: Deploy to stg environment
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Google Cloud
+        uses: google-github-actions/setup-gcloud@main
+        with:
+          service_account_key: ${{ secrets.GCP_GIT_HUB_ACTIONS }}
+          project_id: ${{ env.GCP_PROJECT_ID }}
+      - name: Deploy to stg environment
+        run: >
+          gcloud run deploy
+          --project  ${{ env.GCP_PROJECT_ID }}
+          --image asia-northeast1-docker.pkg.dev/${{ env.GCP_REPOSITORY_NAME }}/${{ env.GCP_IMAGE_NAME }}/${{ env.GCP_CONTAINER_NAME }}:${{ env.DEPLOY_ENVIRONMENT }} 
+          --region asia-northeast1
+          --port 8000
+          --max-instances 4
+          --allow-unauthenticated
+          --format="json"
+          --quiet
+          ${{ env.GCP_PROJECT_ID }}_stg > gcloud_deploy_output.json
+      - name: Make comment file
+        run: |
+          echo '<h2>stg環境へのデプロイが完了しました。</h2><p>以下のURLからテストを行ってください。</p><a href="' > output.html
+          cat gcloud_deploy_output.json | jq ".status.url" >> output.html
+          echo '">' >> output.html
+          cat gcloud_deploy_output.json | jq ".status.url" >> output.html
+          echo '</a>' >> output.html
+      - name: Notify application url
+        run: gh pr comment ${{ github.event.pull_request.number }} --body-file ./output.html
+
