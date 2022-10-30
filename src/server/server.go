@@ -20,8 +20,12 @@ func UploadFileTest() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		file, _ := c.FormFile("file")
 		log.Println(file.Filename)
-		c.SaveUploadedFile(file, fmt.Sprintf("./tmp/%s", file.Filename))
-		c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
+		err := c.SaveUploadedFile(file, fmt.Sprintf("./tmp/%s", file.Filename))
+		if err != nil {
+			c.String(http.StatusInternalServerError, fmt.Sprintf("Failed to upload '%s' !", file.Filename))
+		} else {
+			c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
+		}
 	}
 }
 
