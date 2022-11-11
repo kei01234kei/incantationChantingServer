@@ -1,5 +1,7 @@
 FROM golang:1.19.2-alpine3.15
 
+ENV GOOGLE_APPLICATION_CREDENTIALS /usr/local/.keys/incantationChantingServer
+
 WORKDIR /usr/local/incantationChantingServer
 COPY src/ /usr/local/incantationChantingServer/src/
 COPY go.mod /usr/local/incantationChantingServer/
