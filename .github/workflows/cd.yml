@@ -45,7 +45,8 @@ jobs:
         run: >
           gcloud run deploy
           --project ${{ env.GCP_PROJECT_ID }}
-          --image asia-northeast1-docker.pkg.dev/${{ env.GCP_REPOSITORY_NAME }}/${{ env.GCP_IMAGE_NAME }}/${{ env.GCP_CONTAINER_NAME }}:${{ github.ref_name }} 
+          --image asia-northeast1-docker.pkg.dev/${{ env.GCP_REPOSITORY_NAME }}/${{ env.GCP_IMAGE_NAME }}/${{ env.GCP_CONTAINER_NAME }}:${{ github.ref_name }}
+          --update-secrets=/usr/local/.keys/incantationChantingServer=incantationChantingServer:latest
           --region asia-northeast1
           --port 8000
           --max-instances 4
