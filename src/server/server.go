@@ -10,6 +10,7 @@ import (
 	"incantationChantingServer/src/util"
 	"log"
 	"net/http"
+	"path/filepath"
 )
 
 func GetTest() func(c *gin.Context) {
@@ -66,7 +67,11 @@ func ConvertSoundToText() func(c *gin.Context) {
 		bucket := "incantation-chanting-server"
 		fileName := c.Query("filename")
 		if fileName == "" {
-			c.String(http.StatusInternalServerError, "[Error]: Failed to create client:")
+			c.String(http.StatusInternalServerError, "[Error]: Send filename using filename query !")
+			return
+		}
+		if filepath.Ext(fileName) != ".wav" {
+			c.String(http.StatusInternalServerError, "[Error]: Enter wav file in file name query !")
 			return
 		}
 		ctx := context.Background()
