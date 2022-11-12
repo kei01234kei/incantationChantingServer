@@ -22,11 +22,12 @@ func SaveSentFileToLocal(c *gin.Context) (string, string, error) {
 	// rename the uploaded file using generated hash from file name
 	hashedFileName := sha256.Sum256([]byte(fileName))
 
-	err := c.SaveUploadedFile(file, fmt.Sprintf("./tmp/%s", hex.EncodeToString(hashedFileName[:])))
+	savedFileName := fmt.Sprintf("%s%s", hex.EncodeToString(hashedFileName[:]), filepath.Ext(fileName))
+	err := c.SaveUploadedFile(file, fmt.Sprintf("./tmp/%s", savedFileName))
 	if err != nil {
 		return fileName, "", fmt.Errorf("c.SaveUploadedFile: %v", err)
 	}
-	return fileName, hex.EncodeToString(hashedFileName[:]), nil
+	return fileName, savedFileName, nil
 }
 
 // UploadFile uploads the designated file to cloud storage.
