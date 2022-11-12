@@ -38,22 +38,22 @@ func UploadFileTest() func(c *gin.Context) {
 
 func UploadFile() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		fileName, hashedFileName, err := util.SaveSentFileToLocal(c)
+		fileName, savedFileName, err := util.SaveSentFileToLocal(c)
 		if err != nil {
-			c.String(http.StatusInternalServerError, fmt.Sprintf("[Error]: Failed to save hashed file '%s' to server ! %v", hashedFileName, err))
+			c.String(http.StatusInternalServerError, fmt.Sprintf("[Error]: Failed to save hashed file '%s' to server ! %v", savedFileName, err))
 			return
 		}
-		err = util.UploadFile(hashedFileName)
+		err = util.UploadFile(savedFileName)
 		if err != nil {
-			c.String(http.StatusInternalServerError, fmt.Sprintf("[Error]: Failed to uploading file '%s' to cloud storage ! %v", hashedFileName, err))
+			c.String(http.StatusInternalServerError, fmt.Sprintf("[Error]: Failed to uploading file '%s' to cloud storage ! %v", savedFileName, err))
 			return
 		}
-		fileURL, fileURI := util.GetObjectURLAndURI(hashedFileName)
+		fileURL, fileURI := util.GetObjectURLAndURI(savedFileName)
 		c.JSON(http.StatusOK, gin.H{
-			"name":        fileName,
-			"hashed_name": hashedFileName,
-			"url":         fileURL,
-			"uri":         fileURI,
+			"name":            fileName,
+			"saved_file_name": savedFileName,
+			"url":             fileURL,
+			"uri":             fileURI,
 		})
 	}
 }
