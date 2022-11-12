@@ -2,6 +2,9 @@
 package server
 
 import (
+	speech "cloud.google.com/go/speech/apiv1"
+	"cloud.google.com/go/speech/apiv1/speechpb"
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"incantationChantingServer/src/util"
@@ -55,5 +58,38 @@ func UploadFile() func(c *gin.Context) {
 			"url":             fileURL,
 			"uri":             fileURI,
 		})
+	}
+}
+
+func ConvertSoundToText() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		bucket := "incantation-chanting-server"
+		fileName := c.Query("filename")
+		if fileName == "" {
+			c.String(http.StatusInternalServerError, "[Error]: Failed to create client:")
+			return
+		}
+		ctx := context.Background()
+		client, err := speech.NewClient(ctx)
+		if err != nil {
+			c.String(http.StatusInternalServerError, fmt.Sprintf("[Error]: Failed to create client: %v", err))
+			return
+		}
+		defer client.Close()
+		fileURI := fmt.Sprintf("gs://%s/%s", bucket, fileName)
+		resp, err := client.Recognize(ctx, &speechpb.RecognizeRequest{
+			Config: &speechpb.RecognitionConfig{
+				Encoding:     speechpb.RecognitionConfig_LINEAR16,
+				LanguageCode: "ja-JP",
+			},
+			Audio: &speechpb.RecognitionAudio{
+				AudioSource: &speechpb.RecognitionAudio_Uri{Uri: fileURI},
+			},
+		})
+		if err != nil {
+			c.String(http.StatusInternalServerError, fmt.Sprintf("[Error]: Failed to recognize: %v", err))
+			return
+		}
+		c.JSON(http.StatusOK, resp)
 	}
 }
