@@ -4,6 +4,7 @@ package server
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"incantationChantingServer/src/util"
 	"log"
 	"net/http"
 )
@@ -35,8 +36,24 @@ func UploadFileTest() func(c *gin.Context) {
 	}
 }
 
-func GetFileTest() func(c *gin.Context) {
+func UploadFile() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		c.File(fmt.Sprintf("./tmp/%s", c.Param("name")))
+		fileName, hashedFileName, err := util.SaveSentFileToLocal(c)
+		if err != nil {
+			c.String(http.StatusInternalServerError, fmt.Sprintf("[Error]: Failed to save hashed file '%s' to server ! %v", hashedFileName, err))
+			return
+		}
+		err = util.UploadFile(hashedFileName)
+		if err != nil {
+			c.String(http.StatusInternalServerError, fmt.Sprintf("[Error]: Failed to uploading file '%s' to cloud storage ! %v", hashedFileName, err))
+			return
+		}
+		fileURL, fileURI := util.GetObjectURLAndURI(hashedFileName)
+		c.JSON(http.StatusOK, gin.H{
+			"name":        fileName,
+			"hashed_name": hashedFileName,
+			"url":         fileURL,
+			"uri":         fileURI,
+		})
 	}
 }
