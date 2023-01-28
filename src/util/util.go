@@ -19,7 +19,7 @@ import (
 func SaveSentFileToLocal(c *gin.Context) (string, string, error) {
 	file, _ := c.FormFile("file")
 	fileName := filepath.Base(file.Filename)
-	// rename the uploaded file using generated hash from file name
+	// Rename the uploaded file using generated hash from file name
 	hashedFileName := sha256.Sum256([]byte(fileName))
 
 	savedFileName := fmt.Sprintf("%s%s", hex.EncodeToString(hashedFileName[:]), filepath.Ext(fileName))
