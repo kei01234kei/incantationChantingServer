@@ -58,11 +58,11 @@ func ConvertSoundToText(c *gin.Context) {
 	bucket := "incantation-chanting-server"
 	fileName := c.Query("filename")
 	if fileName == "" {
-		c.String(http.StatusInternalServerError, "[Error]: Send filename using filename query !")
+		c.String(http.StatusBadRequest, "[Error]: Send filename using filename query !")
 		return
 	}
 	if filepath.Ext(fileName) != ".wav" {
-		c.String(http.StatusInternalServerError, "[Error]: Enter wav file in file name query !")
+		c.String(http.StatusUnsupportedMediaType, "[Error]: Enter wav file in file name query !")
 		return
 	}
 	ctx := context.Background()
