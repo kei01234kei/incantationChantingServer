@@ -87,7 +87,7 @@ func ConvertSoundToText(c *gin.Context) {
 		return
 	}
 	if len(resp.Results) == 0 {
-		c.String(http.StatusBadRequest, fmt.Sprintf("[Error]: Failed to recognize sound !"))
+		c.String(http.StatusBadRequest, fmt.Sprint("[Error]: Failed to recognize sound !"))
 		return
 	}
 	c.JSON(http.StatusOK, resp)
